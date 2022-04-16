@@ -22,13 +22,13 @@ class CILRS(nn.Module):
             nn.Linear(512+128, 512),
         )
 
-        self.control_branches = nn.ModuleList([
+        self.branches = nn.ModuleList([
             nn.Sequential(
                 nn.Linear(512, 256),
                 nn.Linear(256, 256),
                 nn.Linear(256, 3),
             ) for i in range(4)
-        ]) # a branch for each high-level command
+        ])  # a branch for each high-level command
 
         self.speed_branch = nn.Sequential(
             nn.Linear(512, 256),
@@ -37,18 +37,14 @@ class CILRS(nn.Module):
         )
 
     def forward(self, img, speed, command):
-        img = self.perception(img) # OK
-        speed = self.speed_fc(speed) # OK
+        img = self.perception(img)  # OK
+        speed = self.speed_fc(speed)  # OK
 
-        emb = torch.cat([img, speed], dim=1) # OK
-        emb = self.emb_fc(emb) # OK
+        emb = torch.cat([img, speed], dim=1)  # OK
+        emb = self.emb_fc(emb)  # OK
 
-        output = self.branches[command](emb) # OK
+        output = self.branches[command.to(dtype=torch.long)](emb)  # OK
 
-        pred_speed = self.speed_branch(img) # OK
+        pred_speed = self.speed_branch(img)  # OK
 
         return output, pred_speed
-
-
-model = CILRS()
-print(model)

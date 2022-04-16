@@ -1,7 +1,15 @@
 from torch.utils.data import Dataset
-from torchvision.io import read_image
+from torchvision import transforms
+from PIL import Image
 import os
 import json
+
+img_transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize([0.485, 0.456, 0.406],
+                         [0.229, 0.224, 0.225])])
 
 
 class ExpertDataset(Dataset):
@@ -15,7 +23,8 @@ class ExpertDataset(Dataset):
     def __getitem__(self, index):
         """Return RGB images and measurements"""
         img_path = os.path.join(self.img_dir, str(index).zfill(8) + ".png")
-        img = read_image(img_path)
+        img = Image.open(img_path)
+        img = img_transform(img)
         measurements_path = os.path.join(
             self.measurements_dir, str(index).zfill(8) + ".json")
         with open(measurements_path, 'r') as file:
