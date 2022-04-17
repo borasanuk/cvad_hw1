@@ -19,3 +19,7 @@ TODO_list.txt
 notes.txt
 error.txt
 *.pt
+models/ref_cil.py
+models/test.py
+test.py
+cilrs_model.ckpt

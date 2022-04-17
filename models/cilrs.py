@@ -8,6 +8,7 @@ class CILRS(nn.Module):
 
     def __init__(self):
         super(CILRS, self).__init__()
+
         self.perception = nn.Sequential(
             resnet18(pretrained=True),
             nn.Linear(1000, 512),
@@ -36,15 +37,16 @@ class CILRS(nn.Module):
             nn.Linear(256, 1),
         )
 
-    def forward(self, img, speed, command):
-        img = self.perception(img)  # OK
-        speed = self.speed_fc(speed)  # OK
+    def forward(self, img, speed):
 
-        emb = torch.cat([img, speed], dim=1)  # OK
-        emb = self.emb_fc(emb)  # OK
+        img = self.perception(img)
+        speed = self.speed_fc(speed)
 
-        output = self.branches[command.to(dtype=torch.long)](emb)  # OK
+        emb = torch.cat([img, speed], dim=1)
+        emb = self.emb_fc(emb)
 
-        pred_speed = self.speed_branch(img)  # OK
+        output = torch.cat([branch(emb) for branch in self.branches], dim=1)
+
+        pred_speed = self.speed_branch(img)
 
         return output, pred_speed

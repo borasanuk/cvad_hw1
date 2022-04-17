@@ -1,8 +1,10 @@
+import torch
 from torch.utils.data import Dataset
 from torchvision import transforms
 from PIL import Image
 import os
 import json
+import numpy as np
 
 img_transform = transforms.Compose([
     transforms.Resize(256),
@@ -20,6 +22,9 @@ class ExpertDataset(Dataset):
         self.img_dir = os.path.join(self.data_root, "rgb")
         self.measurements_dir = os.path.join(self.data_root, "measurements")
 
+    def __len__(self):
+        return len([name for name in os.listdir(self.img_dir)]) - 1
+
     def __getitem__(self, index):
         """Return RGB images and measurements"""
         img_path = os.path.join(self.img_dir, str(index).zfill(8) + ".png")
@@ -29,4 +34,17 @@ class ExpertDataset(Dataset):
             self.measurements_dir, str(index).zfill(8) + ".json")
         with open(measurements_path, 'r') as file:
             measurements = json.load(file)
-        return img, measurements
+
+        speed = torch.tensor([measurements["speed"]], dtype=torch.float32)
+        command = int(measurements["command"])
+        steer = measurements["steer"]
+        throttle = measurements["throttle"]
+        brake = measurements["brake"]
+
+        target_vec = np.zeros((4, 3), dtype=np.float32)
+        target_vec[command, :] = np.array([steer, throttle, brake])
+
+        mask_vec = np.zeros((4, 3), dtype=np.float32)
+        mask_vec[command, :] = 1
+
+        return img, speed, target_vec.reshape(-1), mask_vec.reshape(-1)
