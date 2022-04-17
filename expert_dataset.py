@@ -47,4 +47,11 @@ class ExpertDataset(Dataset):
         mask_vec = np.zeros((4, 3), dtype=np.float32)
         mask_vec[command, :] = 1
 
-        return img, speed, target_vec.reshape(-1), mask_vec.reshape(-1)
+        route_angle = measurements["route_angle"]
+        lane_dist = measurements["lane_dist"]
+        tl_state = measurements["tl_state"]
+        tl_dist = measurements["tl_dist"]
+
+        affordances = np.array([route_angle, lane_dist, tl_state, tl_dist])
+
+        return img, speed, target_vec.reshape(-1), mask_vec.reshape(-1), affordances

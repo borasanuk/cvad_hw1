@@ -16,7 +16,7 @@ def validate(model, dataloader):
 
     loss_fn = nn.L1Loss()
 
-    for i, (img, speed, target, mask) in enumerate(dataloader):
+    for i, (img, speed, target, mask, _) in enumerate(dataloader):
 
         output, pred_speed = model(img, speed)
         command_mask = output * mask
@@ -33,13 +33,12 @@ def train(model, dataloader):
     """Train model on the training dataset for one epoch"""
     losses = []
 
-    # switch to train mode
     model.train()
     # optimizer = optim.SGD(model.parameters(), lr=0.1)
     optimizer = optim.Adam(model.parameters())
     loss_fn = nn.L1Loss()
 
-    for i, (img, speed, target, mask) in enumerate(dataloader):
+    for i, (img, speed, target, mask, _) in enumerate(dataloader):
 
         output, pred_speed = model(img, speed)
         command_mask = output * mask
