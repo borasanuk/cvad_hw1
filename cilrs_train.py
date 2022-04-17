@@ -39,7 +39,7 @@ def train(model, dataloader):
     loss_fn = nn.L1Loss()
 
     for i, (img, speed, target, mask, _) in enumerate(dataloader):
-
+        
         output, pred_speed = model(img, speed)
         command_mask = output * mask
 

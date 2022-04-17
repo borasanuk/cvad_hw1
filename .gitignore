@@ -23,3 +23,4 @@ models/ref_cil.py
 models/test.py
 test.py
 cilrs_model.ckpt
+pred_model.ckpt
